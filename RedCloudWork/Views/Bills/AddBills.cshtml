@@ -1,0 +1,54 @@
+﻿
+@using RedCloudWork.Domian
+@model RedCloudWork.Domian.Salesman
+@{
+    ViewBag.Title = "导入数据";
+}
+
+
+<div class="ibox float-e-margins col-xs-7">
+    <div class="ibox-title">
+        <h5>导入数据</h5>
+        <div class="ibox-tools">
+            <a class="collapse-link">
+                <i class="fa fa-chevron-up"></i>
+            </a>
+            <a class="dropdown-toggle" data-toggle="dropdown" href="table_basic.html#">
+                <i class="fa fa-wrench"></i>
+            </a>
+            <ul class="dropdown-menu dropdown-user">
+                <li>
+                    <a href="table_basic.html#">选项1</a>
+                </li>
+                <li>
+                    <a href="table_basic.html#">选项2</a>
+                </li>
+            </ul>
+            <a class="close-link">
+                <i class="fa fa-times"></i>
+            </a>
+        </div>
+    </div>
+    <div class="ibox-content">
+
+        <form>
+            <div class="form-group">
+                <label for="">选择要导入数据的人员:</label>
+                @Html.DropDownListFor(m => m.Name, ViewBag.Salses as IList<SelectListItem>)
+            </div>
+            <div class="form-group">
+                <label class="font-noraml">文件选择（单选）</label>
+                <div>
+                    <input type="file" class="form-control">
+                </div>
+            </div>
+        </form>
+
+    </div>
+</div>
+@section scripts{
+    @Scripts.Render("/Scripts/H/plugins/prettyfile/bootstrap-prettyfile.js")
+    <script>
+        $('input[type="file"]').prettyFile();
+    </script>
+}

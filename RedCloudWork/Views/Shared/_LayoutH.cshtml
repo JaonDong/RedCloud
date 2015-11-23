@@ -1,0 +1,101 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="renderer" content="webkit">
+    <title>红云同学专属 - 主页</title>
+    <meta name="keywords" content="红云同学专属工作平台">
+    <meta name="description" content="红云同学专属，方便工作，后续有更多功能">
+    <!--[if lt IE 8]>
+    <script>
+        alert('已不支持IE6-8，请使用谷歌、火狐等浏览器\n或360、QQ等国产浏览器的极速模式浏览本页面！');
+    </script>
+    <![endif]-->
+    @Styles.Render("~/Content/h/css")
+    @RenderSection("styles",false)
+</head>
+<body class="fixed-sidebar full-height-layout gray-bg">
+    <div id="wrapper">
+        <!--左侧导航开始-->
+        <nav class="navbar-default navbar-static-side" role="navigation">
+            <div class="nav-close">
+                <i class="fa fa-times-circle"></i>
+            </div>
+            <div class="sidebar-collapse">
+                <ul class="nav" id="side-menu">
+                    <li class="nav-header">
+                        <div class="dropdown profile-element text-center">
+                            <span ><img alt="image" class="img-circle" src="/Images/psu.jpg" /></span>
+                            <a data-toggle="dropdown" class="dropdown-toggle" href="#">
+                                <span class="clear text-center">
+                                    <span class="block m-t-xs"><strong class="font-bold">Hongyun-Yang</strong></span>
+                                    <span class="text-muted text-xs block">超级管理员<b class="caret"></b></span>
+                                </span>
+                            </a>
+                            <ul class="dropdown-menu animated fadeInRight m-t-xs">
+                                <li>
+                                    <a class="J_menuItem" href="#>暂未开发</a>
+                                </li>
+                                <li class="divider"></li>
+                                <li>
+                                    <a href="login.html">安全退出</a>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="logo-element">
+                            H+
+                        </div>
+                    </li>
+                    <li>
+                        <a href="index.html#">
+                            <i class="fa fa-home"></i>
+                            <span class="nav-label">主页</span>
+                            <span class="fa arrow"></span>
+                        </a>
+                        <ul class="nav nav-second-level">
+                            <li>
+                                <a class="J_menuItem" href="@Url.Action("AddBills","Bills")" data-index="0">数据导入</a>
+                            </li>
+                            <li>
+                                <a class="J_menuItem" href="index_v2.html">账单查询</a>
+                            </li>
+                            <li>
+                                <a class="J_menuItem" href="index_v3.html">账单图标查询</a>
+                            </li>
+                            <li>
+                                <a class="J_menuItem" href="index_v4.html">未完待续</a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+        <!--左侧导航结束-->
+        <!--右侧部分开始-->
+        <div id="page-wrapper" class="gray-bg dashbard-1">
+            @RenderBody()
+            <div class="footer fixed">
+              
+                   2015.11.22 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;踏雪无痕
+              
+            </div>
+        </div>
+        <!--右侧部分结束-->
+
+    </div>
+    <script id="welcome-template" type="text/x-handlebars-template">
+        
+    </script>
+    <!-- 全局js -->
+    @Scripts.Render("~/bundles/h/jquery")
+    @Scripts.Render("~/bundles/h/bootstrapjs")
+    @Scripts.Render("~/bundles/h/plugins")
+<!-- 自定义js -->
+    @Scripts.Render("~/Scripts/H/hplus.min.js")
+    @Scripts.Render("~/Scripts/H/contabs.min.js")
+<!-- 第三方插件 -->
+    @Scripts.Render("~/Scripts/H/plugins/pace/pace.min.js")
+    @RenderSection("scripts",false)
+</body>
+</html>
