@@ -10,7 +10,11 @@ namespace RedCloudWork.Controllers
 {
     public class BillsController : Controller
     {
-       
+        protected List<Bills> GetBillsByExecl()
+        {
+            return new List<Bills>();
+        }
+
         // GET: Bills
         public ActionResult AddBills()
         {
@@ -25,5 +29,7 @@ namespace RedCloudWork.Controllers
             
             return View();
         }
+
+  
     }
 }
