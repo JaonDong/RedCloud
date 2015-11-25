@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Web;
+using System.Web.Helpers;
 using System.Web.Mvc;
 using RedCloudWork.Domian;
 
@@ -10,11 +11,7 @@ namespace RedCloudWork.Controllers
 {
     public class BillsController : Controller
     {
-        protected List<Bills> GetBillsByExecl()
-        {
-            return new List<Bills>();
-        }
-
+       
         // GET: Bills
         public ActionResult AddBills()
         {
@@ -29,7 +26,12 @@ namespace RedCloudWork.Controllers
             
             return View();
         }
+        [HttpPost]
+        public JsonResult AddBills(string name, HttpPostedFileBase file)
+        {
 
-  
+            var result = new {state="ok"};
+            return  Json(result);
+        }
     }
 }
