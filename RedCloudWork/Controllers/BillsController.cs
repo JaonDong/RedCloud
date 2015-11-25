@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Web;
+using System.Web.Helpers;
 using System.Web.Mvc;
 using RedCloudWork.Domian;
 
@@ -24,6 +25,13 @@ namespace RedCloudWork.Controllers
             ViewBag.Salses = list ;
             
             return View();
+        }
+        [HttpPost]
+        public JsonResult AddBills(string name, HttpPostedFileBase file)
+        {
+
+            var result = new {state="ok"};
+            return  Json(result);
         }
     }
 }
