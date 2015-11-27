@@ -8,14 +8,17 @@ using System.Web;
 using System.Web.Helpers;
 using System.Web.Mvc;
 using NPOI.HSSF.UserModel;
+using NPOI.SS.UserModel;
 using RedCloudWork.Domian;
 
 namespace RedCloudWork.Controllers
 {
     public class BillsController : Controller
     {
-        protected List<Bills> GetBillsByExecl()
+        protected List<Bills> GetBillsByExecl(string fileName)
         {
+            var table = ComMethod.GetDataTableByExecl(fileName);
+
             return new List<Bills>();
         }
        
@@ -38,17 +41,18 @@ namespace RedCloudWork.Controllers
         {
             if (Request.Files[0] !=null)
             {
-                var fileName = Path.Combine(Request.MapPath("~/Upload"), Path.GetFileName(Request.Files[0].FileName));
+                var fileName = Path.Combine(Request.MapPath("~/Upload"),DateTime.Now.ToString("yyyyMMddHHmmss") +Path.GetFileName(Request.Files[0].FileName));
                 try
                 {
                     file.SaveAs(fileName);
+                    var list = GetBillsByExecl(fileName);
                 }
                 catch (Exception ex)
                 {
                     return Json(new { state = "no" });
                 }
             }
-
+            
             var result = new { state = "ok" };
             return Json(result);
         }

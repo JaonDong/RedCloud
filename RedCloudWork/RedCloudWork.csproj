@@ -192,6 +192,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\BundleConfig.cs" />
+    <Compile Include="App_Start\ComMethod.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\IdentityConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
@@ -236,6 +237,7 @@
     <Compile Include="Domian\MyDbcontext.cs" />
     <Compile Include="Domian\Products.cs" />
     <Compile Include="Domian\Salesman.cs" />
+    <Compile Include="Domian\UploadInfo.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
