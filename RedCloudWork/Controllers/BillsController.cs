@@ -19,6 +19,8 @@ namespace RedCloudWork.Controllers
         {
             var table = ComMethod.GetDataTableByExecl(fileName);
 
+            var list = table.GetModelByDataTable<Bills>();
+
             return new List<Bills>();
         }
        

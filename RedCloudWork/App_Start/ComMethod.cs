@@ -1,9 +1,12 @@
-﻿using System.Data;
+﻿using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Reflection;
 using NPOI.HSSF.UserModel;
 
 namespace RedCloudWork
 {
-    public class ComMethod
+    public static class ComMethod
     {
         /// <summary>
         /// 根据execl文件名获取数据表
@@ -45,6 +48,29 @@ namespace RedCloudWork
                 }
             }
             return table;
+        }
+
+
+        public static IList<T> GetModelByDataTable<T>(this DataTable dt) where T:class,new()
+        {
+            var list=new List<T>();
+            var keys = typeof (T).GetFields(BindingFlags.Public);
+
+            foreach (DataRow row in dt.Rows)
+            {
+                var model=new T();
+                foreach (DataColumn col in dt.Columns)
+                {
+                    var propertyInfo = model.GetType().GetProperty(col.ColumnName);
+                    if (propertyInfo != null && row[col.ColumnName] != DBNull.Value)
+                    {
+                        propertyInfo.SetValue(model, row[col.ColumnName],null);
+                    }
+                }
+                list.Add(model);
+            }
+
+            return list;
         }
     }
 }

@@ -4,6 +4,7 @@ namespace RedCloudWork.Domian
 {
     public class Bills:BaseEntity
     {
+        #region Fileds
         /// <summary>
         /// 业务员
         /// </summary>
@@ -11,11 +12,11 @@ namespace RedCloudWork.Domian
         /// <summary>
         /// 账单使用的产品
         /// </summary>
-         public Products Product { get; set; }
+        public Products Product { get; set; }
         /// <summary>
         /// 计费来源，当前只有“结算”
         /// </summary>
-         public string ChargeSource { get; set; }
+        public string ChargeSource { get; set; }
         /// <summary>
         /// 业务请求编号
         /// </summary>
@@ -44,5 +45,9 @@ namespace RedCloudWork.Domian
         /// 是否完成
         /// </summary>
         public bool CompleteState { get; set; }
+
+        #endregion
+
+         
     }
 }
