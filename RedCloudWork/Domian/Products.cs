@@ -1,4 +1,6 @@
-﻿namespace RedCloudWork.Domian
+﻿using System.Collections.Generic;
+
+namespace RedCloudWork.Domian
 {
     /// <summary>
     /// 支付产品类别  eg:乐付宝及时付
@@ -6,5 +8,7 @@
     public class Products:BaseEntity
     {
          public string Name { get; set; }
+
+        public virtual IList<Bills> Bills { get; set; }
     }
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Reflection;
 using NPOI.HSSF.UserModel;
+using RedCloudWork.Domian;
 
 namespace RedCloudWork
 {
@@ -71,6 +72,29 @@ namespace RedCloudWork
             }
 
             return list;
+        }
+
+
+        public static string ComTime(this string str)
+        {
+            return str.Insert(str.LastIndexOf('/')+1, "20");
+        }
+
+        public static int SaveChange(this IList<Bills> billses)
+        {
+            var myContext=new MyDbcontext();
+            foreach (var bill in billses)
+            {
+                myContext.Bills.Add(bill);
+            }
+            return myContext.SaveChanges();
+        }
+
+        public static IRepository<T> GetRepository<T>() where T : BaseEntity
+        {
+            var mycontext=new MyDbcontext();
+
+            return new EfRepository<T>(mycontext);
         }
     }
 }

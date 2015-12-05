@@ -232,7 +232,9 @@
     <Compile Include="Controllers\ValuesController.cs" />
     <Compile Include="Domian\BaseEntity.cs" />
     <Compile Include="Domian\Bills.cs" />
+    <Compile Include="Domian\EfRepository.cs" />
     <Compile Include="Domian\IEntity.cs" />
+    <Compile Include="Domian\IRepository.cs" />
     <Compile Include="Domian\Merchants.cs" />
     <Compile Include="Domian\MyDbcontext.cs" />
     <Compile Include="Domian\Products.cs" />
@@ -244,6 +246,14 @@
     <Compile Include="Migrations\201511221415303_Init.cs" />
     <Compile Include="Migrations\201511221415303_Init.Designer.cs">
       <DependentUpon>201511221415303_Init.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201512010305111_add 关.cs" />
+    <Compile Include="Migrations\201512010305111_add 关.Designer.cs">
+      <DependentUpon>201512010305111_add 关.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201512010325313_AddForeignKey.cs" />
+    <Compile Include="Migrations\201512010325313_AddForeignKey.Designer.cs">
+      <DependentUpon>201512010325313_AddForeignKey.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountBindingModels.cs" />
@@ -379,6 +389,12 @@
   <ItemGroup>
     <EmbeddedResource Include="Migrations\201511221415303_Init.resx">
       <DependentUpon>201511221415303_Init.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201512010305111_add 关.resx">
+      <DependentUpon>201512010305111_add 关.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201512010325313_AddForeignKey.resx">
+      <DependentUpon>201512010325313_AddForeignKey.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

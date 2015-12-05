@@ -15,13 +15,15 @@ namespace RedCloudWork.Controllers
 {
     public class BillsController : Controller
     {
-        protected List<Bills> GetBillsByExecl(string fileName)
+
+        protected List<Bills> GetBillsByExecl(string fileName,string name)
         {
             var table = ComMethod.GetDataTableByExecl(fileName);
 
-            var list = table.GetModelByDataTable<Bills>();
+            //var list = table.GetModelByDataTable<Bills>();
+            var list = GeListByDt(table, name);
 
-            return new List<Bills>();
+            return list;
         }
        
         // GET: Bills
@@ -47,7 +49,9 @@ namespace RedCloudWork.Controllers
                 try
                 {
                     file.SaveAs(fileName);
-                    var list = GetBillsByExecl(fileName);
+                    var list = GetBillsByExecl(fileName, name);
+
+                    list.SaveChange();
                 }
                 catch (Exception ex)
                 {
@@ -57,6 +61,64 @@ namespace RedCloudWork.Controllers
             
             var result = new { state = "ok" };
             return Json(result);
+        }
+
+        public  List<Bills> GeListByDt(DataTable dt, string name)
+        {
+            var list = new List<Bills>();
+
+            try
+            {
+                var productRepository = ComMethod.GetRepository<Products>();
+                var saleManRepository = ComMethod.GetRepository<Salesman>();
+                var merchantRepository = ComMethod.GetRepository<Merchants>();
+
+                foreach (DataRow row in dt.Rows)
+                {
+                    var productName = row["产品"].ToString();
+                    var merchantNo = row["商户编号"].ToString();
+                    var product = productRepository.Table.FirstOrDefault(p => p.Name==productName);
+                    var saleMan = saleManRepository.Table.FirstOrDefault(p => p.Name == name);
+                    var merchant =merchantRepository.Table.FirstOrDefault(p => p.Name == merchantNo);
+
+                    if (product == null)
+                    {
+                        product = new Products() { Name = productName };
+                        productRepository.Insert(product);
+                    }
+                    if (saleMan==null)
+                        saleMan=new Salesman() {Name = name};
+                    if(merchant==null)
+                        merchant=new Merchants()
+                        {
+                            MerchantNo = merchantNo,
+                            Name = row["商户"].ToString()
+                        };
+
+                    var model = new Bills
+                    {
+                        Product = product,
+                        ChargeSource = row["计费来源"].ToString(),
+                        Salesman = saleMan,
+                        ServiceRequestNo = row["业务请求编号"].ToString(),
+                        Merchant = merchant,
+                        Amount = decimal.Parse(row["计费金额"].ToString()),
+                        TradingTime = DateTime.Parse(row["交易时间"].ToString().ComTime()),
+                        CompletionTime = DateTime.Parse(row["完成时间"].ToString().ComTime()),
+                        ProductExpense = decimal.Parse(row["产品费用"].ToString()),
+                        CompleteState = row["状态"].ToString() == "已完成"
+                    };
+
+
+                    list.Add(model);
+                }
+            }
+            catch (Exception ex)
+            {
+                //写入日志
+            }
+            return list;
+
         }
     }
 }
