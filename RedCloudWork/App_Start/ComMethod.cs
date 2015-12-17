@@ -9,6 +9,8 @@ namespace RedCloudWork
 {
     public static class ComMethod
     {
+
+        public static MyDbcontext _mycontext = new MyDbcontext();
         /// <summary>
         /// 根据execl文件名获取数据表
         /// </summary>
@@ -92,9 +94,8 @@ namespace RedCloudWork
 
         public static IRepository<T> GetRepository<T>() where T : BaseEntity
         {
-            var mycontext=new MyDbcontext();
 
-            return new EfRepository<T>(mycontext);
+            return new EfRepository<T>(_mycontext);
         }
     }
 }

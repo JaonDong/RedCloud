@@ -337,6 +337,7 @@
     <Content Include="Content\fonts\fontawesome-webfont.eot" />
     <Content Include="Content\fonts\fontawesome-webfont.woff2" />
     <Content Include="Content\fonts\glyphicons-halflings-regular.woff2" />
+    <None Include="Properties\PublishProfiles\Test.pubxml" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\H\bootstrap.min.js" />
     <Content Include="Scripts\H\contabs.min.js" />

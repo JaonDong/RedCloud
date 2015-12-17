@@ -34,7 +34,7 @@ namespace RedCloudWork.Controllers
                 select new SelectListItem()
                 {
                     Text = item.Name,
-                    Value = item.Id.ToString()
+                    Value = item.Name
                 }).ToList();
             ViewBag.Salses = list ;
             
@@ -51,7 +51,6 @@ namespace RedCloudWork.Controllers
                     file.SaveAs(fileName);
                     var list = GetBillsByExecl(fileName, name);
 
-                    list.SaveChange();
                 }
                 catch (Exception ex)
                 {
@@ -72,6 +71,7 @@ namespace RedCloudWork.Controllers
                 var productRepository = ComMethod.GetRepository<Products>();
                 var saleManRepository = ComMethod.GetRepository<Salesman>();
                 var merchantRepository = ComMethod.GetRepository<Merchants>();
+                var billsRepository = ComMethod.GetRepository<Bills>();
 
                 foreach (DataRow row in dt.Rows)
                 {
@@ -85,23 +85,36 @@ namespace RedCloudWork.Controllers
                     {
                         product = new Products() { Name = productName };
                         productRepository.Insert(product);
+                        product = productRepository.Table.FirstOrDefault(p => p.Name == productName);
                     }
-                    if (saleMan==null)
-                        saleMan=new Salesman() {Name = name};
-                    if(merchant==null)
-                        merchant=new Merchants()
+                    if (saleMan == null)
+                    {
+                        saleMan = new Salesman() { Name = name };
+                        saleManRepository.Insert(saleMan);
+                        saleMan = saleManRepository.Table.FirstOrDefault(p => p.Name == name);
+                    }
+                    if (merchant == null)
+                    {
+                        merchant = new Merchants()
                         {
                             MerchantNo = merchantNo,
                             Name = row["商户"].ToString()
                         };
+                        merchantRepository.Insert(merchant);
+                        merchant = merchantRepository.Table.FirstOrDefault(p => p.MerchantNo == merchantNo);
+                    }
+                 
 
                     var model = new Bills
                     {
                         Product = product,
+                        ProductId = product.Id,
                         ChargeSource = row["计费来源"].ToString(),
                         Salesman = saleMan,
+                        SalesmanId = saleMan.Id,
                         ServiceRequestNo = row["业务请求编号"].ToString(),
                         Merchant = merchant,
+                        MerchantId = merchant.Id,
                         Amount = decimal.Parse(row["计费金额"].ToString()),
                         TradingTime = DateTime.Parse(row["交易时间"].ToString().ComTime()),
                         CompletionTime = DateTime.Parse(row["完成时间"].ToString().ComTime()),
@@ -109,8 +122,7 @@ namespace RedCloudWork.Controllers
                         CompleteState = row["状态"].ToString() == "已完成"
                     };
 
-
-                    list.Add(model);
+                    billsRepository.Insert(model);
                 }
             }
             catch (Exception ex)
