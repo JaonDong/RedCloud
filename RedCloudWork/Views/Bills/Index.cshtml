@@ -1,0 +1,46 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+}
+@section styles
+{
+    <link href="~/Content/plugins/dataTables/dataTables.min.css"   rel="stylesheet"/>
+}
+<div class="col-xs-10 col-xs-offset-1">
+    <table id="example" class="table table-bordered table-striped table-hover">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Age</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>1</td>
+                <td>2</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+@section scripts
+{
+    <script src="~/Scripts/plugins/jquery.dataTables.min.js"></script>
+    <script type="text/javascript">
+        var editor;
+        $(document).ready(function() {
+          
+            $('#example').DataTable({
+                serverSide: true,
+                ajax: {
+                    url: '/bills/SelectBills',
+                    type: 'POST'
+                },
+                select: true
+            });
+        });
+
+
+    </script>
+}
+

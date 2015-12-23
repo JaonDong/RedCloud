@@ -16,7 +16,8 @@ namespace RedCloudWork.Controllers
     public class BillsController : Controller
     {
 
-        protected List<Bills> GetBillsByExecl(string fileName,string name)
+        #region 辅助方法
+        protected List<Bills> GetBillsByExecl(string fileName, string name)
         {
             var table = ComMethod.GetDataTableByExecl(fileName);
 
@@ -25,44 +26,7 @@ namespace RedCloudWork.Controllers
 
             return list;
         }
-       
-        // GET: Bills
-        public ActionResult AddBills()
-        {
-            var myContext = new MyDbcontext();
-            var list = (from item in myContext.Saleswoman
-                select new SelectListItem()
-                {
-                    Text = item.Name,
-                    Value = item.Name
-                }).ToList();
-            ViewBag.Salses = list ;
-            
-            return View();
-        }
-        [HttpPost]
-        public JsonResult AddBills(string name, HttpPostedFileBase file)
-        {
-            if (Request.Files[0] !=null)
-            {
-                var fileName = Path.Combine(Request.MapPath("~/Upload"),DateTime.Now.ToString("yyyyMMddHHmmss") +Path.GetFileName(Request.Files[0].FileName));
-                try
-                {
-                    file.SaveAs(fileName);
-                    var list = GetBillsByExecl(fileName, name);
-
-                }
-                catch (Exception ex)
-                {
-                    return Json(new { state = "no" });
-                }
-            }
-            
-            var result = new { state = "ok" };
-            return Json(result);
-        }
-
-        public  List<Bills> GeListByDt(DataTable dt, string name)
+        protected List<Bills> GeListByDt(DataTable dt, string name)
         {
             var list = new List<Bills>();
 
@@ -77,9 +41,9 @@ namespace RedCloudWork.Controllers
                 {
                     var productName = row["产品"].ToString();
                     var merchantNo = row["商户编号"].ToString();
-                    var product = productRepository.Table.FirstOrDefault(p => p.Name==productName);
+                    var product = productRepository.Table.FirstOrDefault(p => p.Name == productName);
                     var saleMan = saleManRepository.Table.FirstOrDefault(p => p.Name == name);
-                    var merchant =merchantRepository.Table.FirstOrDefault(p => p.Name == merchantNo);
+                    var merchant = merchantRepository.Table.FirstOrDefault(p => p.MerchantNo == merchantNo);
 
                     if (product == null)
                     {
@@ -103,7 +67,7 @@ namespace RedCloudWork.Controllers
                         merchantRepository.Insert(merchant);
                         merchant = merchantRepository.Table.FirstOrDefault(p => p.MerchantNo == merchantNo);
                     }
-                 
+
 
                     var model = new Bills
                     {
@@ -131,6 +95,60 @@ namespace RedCloudWork.Controllers
             }
             return list;
 
+        } 
+        #endregion
+
+        // GET: Bills
+        public ActionResult AddBills()
+        {
+            var myContext = new MyDbcontext();
+            var list = (from item in myContext.Saleswoman
+                        select new SelectListItem()
+                        {
+                            Text = item.Name,
+                            Value = item.Name
+                        }).ToList();
+            ViewBag.Salses = list;
+
+            return View();
         }
+        [HttpPost]
+        public JsonResult AddBills(string name, HttpPostedFileBase file)
+        {
+            if (Request.Files[0] != null)
+            {
+                var fileName = Path.Combine(Request.MapPath("~/Upload"), DateTime.Now.ToString("yyyyMMddHHmmss") + Path.GetFileName(Request.Files[0].FileName));
+                try
+                {
+                    file.SaveAs(fileName);
+                    var list = GetBillsByExecl(fileName, name);
+
+                }
+                catch (Exception ex)
+                {
+                    return Json(new { state = "no" });
+                }
+            }
+
+            var result = new { state = "ok" };
+            return Json(result);
+        }
+
+
+        public ActionResult Index()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public JsonResult SelectBills()
+        {
+            var request = Request;
+
+            
+
+            return Json(new {Name="神",Age=18});
+        }
+
     }
 }
