@@ -25,6 +25,7 @@ namespace RedCloudWork.Controllers
         // POST api/values
         public void Post([FromBody]string value)
         {
+            int i = 0;
         }
 
         // PUT api/values/5

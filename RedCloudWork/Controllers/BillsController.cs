@@ -10,6 +10,7 @@ using System.Web.Mvc;
 using NPOI.HSSF.UserModel;
 using NPOI.SS.UserModel;
 using RedCloudWork.Domian;
+using RedCloudWork.Models;
 
 namespace RedCloudWork.Controllers
 {
@@ -140,14 +141,40 @@ namespace RedCloudWork.Controllers
             return View();
         }
 
+        public ActionResult Test()
+        {
+            return View();
+        }
+
         [HttpPost]
-        public JsonResult SelectBills()
+        public JsonResult SelectBills(string sSearch = "", int start = 0, int length = 20)
         {
             var request = Request;
+            var list = new List<TestModel>()
+            {
+                new TestModel(){Name = "Jack",Age = 18},
+                new TestModel(){Name = "董陌陌",Age = 20},
+                new TestModel(){Name = "Dong",Age = 36},
+                new TestModel(){Name = "Jack",Age = 18},
+                new TestModel(){Name = "董陌陌",Age = 20},
+                new TestModel(){Name = "Dong",Age = 36},
+                new TestModel(){Name = "Jack",Age = 18},
+                new TestModel(){Name = "董陌陌",Age = 20},
+                new TestModel(){Name = "Dong",Age = 36},
+                new TestModel(){Name = "Jack",Age = 18},
+                new TestModel(){Name = "董陌陌",Age = 20},
+                new TestModel(){Name = "Dong",Age = 36},
+            };
 
-            
+            if (sSearch != "")
+            {
+                list = list.Where(x => x.Name.Contains(sSearch) || x.Age.ToString().Contains(sSearch)).ToList();
+            }
 
-            return Json(new {Name="神",Age=18});
+            var pageData = list.Skip(start).Take(length);
+            var restult = new { data = pageData, recordsTotal = list.Count, recordsFiltered = list.Count };
+
+            return Json(restult);
         }
 
     }
