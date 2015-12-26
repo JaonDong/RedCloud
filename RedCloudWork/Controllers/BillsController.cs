@@ -150,29 +150,40 @@ namespace RedCloudWork.Controllers
         public JsonResult SelectBills(string sSearch = "", int start = 0, int length = 20)
         {
             var request = Request;
-            var list = new List<TestModel>()
-            {
-                new TestModel(){Name = "Jack",Age = 18},
-                new TestModel(){Name = "董陌陌",Age = 20},
-                new TestModel(){Name = "Dong",Age = 36},
-                new TestModel(){Name = "Jack",Age = 18},
-                new TestModel(){Name = "董陌陌",Age = 20},
-                new TestModel(){Name = "Dong",Age = 36},
-                new TestModel(){Name = "Jack",Age = 18},
-                new TestModel(){Name = "董陌陌",Age = 20},
-                new TestModel(){Name = "Dong",Age = 36},
-                new TestModel(){Name = "Jack",Age = 18},
-                new TestModel(){Name = "董陌陌",Age = 20},
-                new TestModel(){Name = "Dong",Age = 36},
-            };
+            var billsRepository = ComMethod.GetRepository<Bills>();
+
+            var query =
+                billsRepository.Table;
+            var allCount = query.Count();
 
             if (sSearch != "")
             {
-                list = list.Where(x => x.Name.Contains(sSearch) || x.Age.ToString().Contains(sSearch)).ToList();
+                query = query.Where(x => x.Salesman.Name.Contains(sSearch) || x.Product.Name.Contains(sSearch)||x.Merchant.Name.Contains(sSearch));
+                if (sSearch == "完成")
+                {
+                    query = query.Where(x => x.CompleteState );
+                }
             }
+            var count= query.Count();
+            var sumAmout = count>0? query.Sum(x => x.Amount):0;
+            var sumExpense = count > 0 ? query.Sum(x => x.ProductExpense):0;
 
-            var pageData = list.Skip(start).Take(length);
-            var restult = new { data = pageData, recordsTotal = list.Count, recordsFiltered = list.Count };
+             query = query.OrderBy(x=>x.TradingTime).Skip(start).Take(length);
+
+            var pageData = (from item in query
+                select new
+                {
+                    saleName=item.Salesman.Name,
+                    merchantName=item.Merchant.Name,
+                    productName=item.Product.Name,
+                    requestNo=item.ServiceRequestNo,
+                    amount=item.Amount,
+                    completedTime=item.CompletionTime,
+                    completeState=item.CompleteState,
+                    productExpense=item.ProductExpense,
+                }).ToList();
+
+            var restult = new { data = pageData, recordsTotal = allCount, recordsFiltered = count ,sumAmout=sumAmout,sumExpense=sumExpense};
 
             return Json(restult);
         }

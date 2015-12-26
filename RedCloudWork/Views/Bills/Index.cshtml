@@ -2,45 +2,173 @@
 @{
     ViewBag.Title = "Index";
 }
-@section styles
-{
-    <link href="~/Content/plugins/dataTables/dataTables.min.css"   rel="stylesheet"/>
+@section styles{
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/s/bs-3.3.5/dt-1.10.10,af-2.1.0,b-1.1.0,b-colvis-1.1.0,b-html5-1.1.0,b-print-1.1.0,cr-1.3.0,r-2.0.0,se-1.1.0/datatables.css" />
 }
-<div class="col-xs-10 col-xs-offset-1">
-    <table id="example" class="table table-bordered table-striped table-hover">
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Age</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>1</td>
-                <td>2</td>
-            </tr>
-        </tbody>
-    </table>
+<div class="hidden" id="hidden_filter">
+    @* 把需要搜索的条件放到hidden里面，在table格式化完成的时候直接调用$.html()赋值，免去了在js拼接标签的麻烦 *@
+    <div class="row" style="margin-right:0;">
+
+        @Html.TextBox("name", "", new { @class = "form-control input-small", style = "width:150px", placeholder = "请输入姓名" })
+        <button id="go_search" class="btn btn-default">搜索</button>
+    </div>
+
 </div>
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <div class="panel-title">
+            Test
+        </div>
+    </div>
+    <div class="panel-body">
+        <table id="table_server" class="table table-bordered table-striped table-hover">
+            <thead>
+                <tr>
+                    <th>营销人员</th>
+                    <th>商户</th>
+                    <th>产品</th>
+                    <th>请求编号</th>
+                    <th>金额</th>
+                    <th>费金</th>
+                    <th>完成时间</th>
+                    <th>账单状态</th>
+                </tr>
+            </thead>
+            <tfoot>
+                    <tr>
+                        <td>总计:</td>
+                        <td colspan="3"></td>
+                        <td><span id="sumAmout"></span></td>
+                        <td><span id="sumExpense"></span></td>
+                        <td colspan="2"></td>
+                    </tr>
+            </tfoot>
+        </table>
+    </div>
+</div>
+
 
 @section scripts
 {
-    <script src="~/Scripts/plugins/jquery.dataTables.min.js"></script>
-    <script type="text/javascript">
-        var editor;
-        $(document).ready(function() {
-          
-            $('#example').DataTable({
-                serverSide: true,
-                ajax: {
-                    url: '/bills/SelectBills',
-                    type: 'POST'
+    <script type="text/javascript" src="https://cdn.datatables.net/s/bs-3.3.5/dt-1.10.10,af-2.1.0,b-1.1.0,b-colvis-1.1.0,b-html5-1.1.0,b-print-1.1.0,cr-1.3.0,r-2.0.0,se-1.1.0/datatables.js"></script>
+    <script>
+        function data_string(str) {
+            var dFormat = function(i) { return i < 10 ? "0" + i.toString() : i; }
+            var d = eval('new ' + str.substr(1, str.length - 2));
+            var ar_date = [d.getFullYear(), d.getMonth() + 1, d.getDate(), d.getHours(), d.getMinutes(), d.getSeconds()];
+            for (var i = 0; i < ar_date.length; i++) ar_date[i] = dFormat(ar_date[i]);
+            return ar_date.slice(0, 3).join('-') + ' ' + ar_date.slice(3).join(':');
+        }
+
+        var tablePrefix = "#table_server_";
+        $("#table_server")
+            .on('xhr.dt', function (e, settings, json, xhr) {
+                getTotal(json);
+                // Note no return - manipulate the data directly in the JSON object.
+            })
+            .dataTable({
+            serverSide: true, //分页，取数据等等的都放到服务端去
+            processing: true, //载入数据的时候是否显示“载入中”
+            pageLength: 10, //首次加载的数据条数
+            ordering: false, //排序操作在服务端进行，所以可以关了。
+            sServerMethod: "POST",
+            showRowNumber: true,
+            ajax: {
+//类似jquery的ajax参数，基本都可以用。
+                type: "post", //后台指定了方式，默认get，外加datatable默认构造的参数很长，有可能超过get的最大长度。
+                url: "/bills/SelectBills",
+                dataSrc: "data", //默认data，也可以写其他的，格式化table的时候取里面的数据
+                data: function(d) { //d 是原始的发送给服务器的数据，默认很长。
+                    var param = {}; //因为服务端排序，可以新建一个参数对象
+                    param.start = d.start; //开始的序号
+                    param.length = d.length; //要取的数据的
+                    param.sSearch = d.search.value;
+                    //var formData = $("#filter_form").serializeArray();//把form里面的数据序列化成数组
+                    //formData.forEach(function (e) {
+                    //    param[e.name] = e.value;
+                    //});
+                    return param; //自定义需要传递的参数。
                 },
-                select: true
-            });
+                callback: function() {}
+            },
+            //saleName=item.Salesman.Name,
+            //merchantName=item.Merchant.Name,
+            //requestNo=item.ServiceRequestNo,
+            //amount=item.Amount,
+            //completedTime=item.CompletionTime,
+            //completeState=item.CompleteState,
+            //productExpense=item.ProductExpense
+            columns: [
+//对应上面thead里面的序列
+                { data: "saleName" },
+                { data: "merchantName" },
+                 { data: "productName" },
+                { data: "requestNo" },
+                { data: "amount" },
+                { data: "productExpense" },
+                {
+                    data: "completedTime",
+                    sType: 'date',
+                    render: function(data) {
+                        var dateStr = data_string(data);
+                        return "<div class= date>" + dateStr + "<div>";
+                    }
+                },
+                {
+                    data: "completeState",
+                    render: function(data) {
+                        return data ? "完成" : "未完成";
+                    }
+                }
+
+                //{
+                //    data: function (e) {//这里给最后一列返回一个操作列表
+                //        //e是得到的json数组中的一个item ，可以用于控制标签的属性。
+                //        return '<a class="btn btn-default btn-xs show-detail-json"><i class="icon-edit"></i>显示详细</a>';
+                //    }
+                //}
+            ],
+            initComplete:
+                function(setting, json) {
+                    //初始化完成之后替换原先的搜索框。
+                    //本来想把form标签放到hidden_filter 里面，因为事件绑定的缘故，还是拿出来。
+                    //$(tablePrefix + "filter").html("<form id='filter_form'>" + $("#hidden_filter").html() + "</form>");
+                },
+            language: {
+                lengthMenu: '<select class="form-control input-xsmall">' + '<option value="5">5</option>' + '<option value="10">10</option>' + '<option value="20">20</option>' + '<option value="30">30</option>' + '<option value="40">40</option>' + '<option value="50">50</option>' + '</select>条记录', //左上角的分页大小显示。
+                processing:
+                    "载入中", //处理页面数据的时候的显示
+                paginate:
+                {
+//分页的样式文本内容。
+                    previous: "上一页",
+                    next:
+                        "下一页",
+                    first:
+                        "第一页",
+                    last:
+                        "最后一页"
+                },
+
+                zeroRecords: "没有内容", //table tbody内容为空时，tbody的内容。
+                //下面三者构成了总体的左下角的内容。
+                info:
+                    "总共_PAGES_ 页，显示第_START_ 到第 _END_ ，筛选之后得到 _TOTAL_ 条，初始_MAX_ 条 ", //左下角的信息显示，大写的词为关键字。
+                infoEmpty:
+                    "0条记录", //筛选为空时左下角的显示。
+                infoFiltered:
+                    "" //筛选之后的左下角筛选提示(另一个是分页信息显示，在上面的info中已经设置，所以可以不显示)，
+            }
         });
 
 
+        var getTotal = function(data) {
+            if (data) {
+                $("#sumAmout").text(data.sumAmout);
+                $("#sumExpense").text(data.sumExpense);
+            };
+        };
     </script>
 }
 
