@@ -151,7 +151,8 @@ namespace RedCloudWork.Controllers
         {
             var request = Request;
             var billsRepository = ComMethod.GetRepository<Bills>();
-
+            var dataModel = new DataTablesModel(Request);
+            
             var query =
                 billsRepository.Table;
             var allCount = query.Count();
@@ -168,8 +169,8 @@ namespace RedCloudWork.Controllers
             var sumAmout = count>0? query.Sum(x => x.Amount):0;
             var sumExpense = count > 0 ? query.Sum(x => x.ProductExpense):0;
 
-             query = query.OrderBy(x=>x.TradingTime).Skip(start).Take(length);
-
+            query = query.OrderBy(x=>x.TradingTime).Skip(start).Take(length);
+            
             var pageData = (from item in query
                 select new
                 {

@@ -1,197 +1,170 @@
-﻿namespace RedCloudWork.Models
+﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.Linq;
+using System.Web;
+
+namespace RedCloudWork.Models
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Web;
-
-    // 排序的方向
-    public enum SortDirection
+    public class Search
     {
-        Asc,    // 升序
-        Desc    // 降序
+        private const string _value = "[search][value]";
+        private const string _FirtsValue = "search[value]";
+        private const string _regex = "[search][regex]";
+        private const string _FirtsRegex = "search[regex]";
+        public string Value { get; set; }
+        public string Regex { get; set; }
+
+        public Search(IEnumerable<KeyValuePair<string, string>> keyValues)
+        {
+            foreach (var keyValue in keyValues)
+            {
+                switch (keyValue.Key)
+                {
+                    case _value:
+                        this.Value = keyValue.Value;
+                        break;
+                    case _regex:
+                        this.Regex = keyValue.Value;
+                        break;
+                    case _FirtsValue:
+                        this.Value = keyValue.Value;
+                        break;
+                    case _FirtsRegex:
+                        this.Regex = keyValue.Value;
+                        break;
+
+                }
+            }
+        }
     }
 
-    // 排序列的定义
-    public class SortColumn
-    {
-        public int Index { get; set; }                  // 列序号
-        public SortDirection Direction { get; set; }    // 列的排序方向
-    }
-
-    // 列定义
     public class Column
     {
-        public string Name { get; set; }        // 列名
-        public bool Sortable { get; set; }      // 是否可排序
-        public bool Searchable { get; set; }    // 是否可搜索
-        public string Search { get; set; }      // 搜索串
-        public bool EscapeRegex { get; set; }   // 是否正则
-    }
+        private const string _data = "[data]";
+        private const string _name = "[name]";
+        private const string _searchable = "[searchable]";
+        private const string _orderable = "[orderable]";
+        private const string _search = "[search]";
+        public string Data { get;  set; }
+        public string Name { get; set; }
+        public bool Searchable { get; set; }
 
+        public bool Orderable { get; set; }
+
+        public Search Search { get; set; }
+
+
+        public Column(IEnumerable<KeyValuePair<string, string>> keyValues)
+        {
+            var keyValuePairs = keyValues as KeyValuePair<string, string>[] ?? keyValues.ToArray();
+            foreach (var keyValue in keyValuePairs)
+            {
+                switch (keyValue.Key)
+                {
+                    case _data:
+                        this.Data = keyValue.Value;
+                        break;
+                    case _name:
+                        this.Name = keyValue.Value;
+                        break;
+                    case _searchable:
+                        this.Orderable = DataTablesModel.TryParseBool(keyValue.Value);
+                        break;
+                    case _orderable:
+                        this.Searchable = DataTablesModel.TryParseBool(keyValue.Value);
+                        break;
+                }
+            }
+            this.Search=new Search(keyValuePairs.Where(x=>x.Key.Contains(_search)).ToList());
+        }
+
+    }
     public class DataTablesModel
     {
-        private readonly HttpRequestBase _request;        // 内部使用的 Request 对象
-
-        public DataTablesModel(System.Web.HttpRequestBase request)    // 用于 MVC 模式下的构造函数
+        private readonly HttpRequestBase _request;
+        private const string StartPar = "start";
+        private const string LengthPar = "length";
+        private const string DrawPar = "draw";
+        private const string ColumnPar = "columns";
+        private const string SearchPar = "search[";
+        public DataTablesModel(HttpRequestBase request)
         {
-            this._request = request;
+            _request = request;
+            
+            //
+            Columns=new List<Column>();
 
-            this.echo = this.ParseStringParameter(sEchoParameter);
-            this.displayStart = this.ParseIntParameter(iDisplayStartParameter);
-            this.displayLength = this.ParseIntParameter(iDisplayLengthParameter);
-            this.sortingCols = this.ParseIntParameter(iSortingColsParameter);
-
-            this.search = this.ParseStringParameter(sSearchParameter);
-            this.regex = this.ParseStringParameter(bRegexParameter) == "true";
-
-            // 排序的列
-            int count = this.iSortingCols;
-            this.sortColumns = new SortColumn[count];
-            for (int i = 0; i < count; i++)
+            var listValues = GetColumnKeyValues(request.Form);
+            foreach (var keyValues in listValues)
             {
-                SortColumn col = new SortColumn();
-                col.Index = this.ParseIntParameter(string.Format("iSortCol_{0}", i));
-                col.Direction = SortDirection.Asc;
-                if (this.ParseStringParameter(string.Format("sSortDir_", i)) == "desc")
-                    col.Direction = SortDirection.Desc;
-                this.sortColumns[i] = col;
+                Columns.Add(new Column(keyValues));
             }
 
-            this.ColumnCount = this.ParseIntParameter(iColumnsParameter);
+            //
+            Start =TryParseInt(_request.Form[StartPar]);
+            //
+            Length = TryParseInt(_request.Form[LengthPar]);
+            //
+            Draw = TryParseInt(_request.Form[DrawPar]);
 
-            count = this.ColumnCount;
-            this.columns = new Column[count];
-
-            string[] names = this.ParseStringParameter(sColumnsParameter).Split(',');
-
-            for (int i = 0; i < count; i++)
-            {
-                var col = new Column();
-                col.Name = names[i];
-                col.Sortable = this.ParseStringParameter(string.Format("bSortable_{0}", i)) == "true";
-                col.Searchable = this.ParseStringParameter(string.Format("bSearchable_{0}", i)) == "true";
-                col.Search = this.ParseStringParameter(string.Format("sSearch_{0}", i));
-                col.EscapeRegex = this.ParseStringParameter(string.Format("bRegex_{0}", i)) == "true";
-                columns[i] = col;
-            }
+            this.Search = new Search(request.Form.AllKeys.Where(x => x.Contains(SearchPar)).Select(x=>new KeyValuePair<string, string>(x,request.Form[x])).ToList());
         }
-        public DataTablesModel(HttpRequest httpRequest)       // 标准的 WinForm 方式下的构造函数
-            : this(new HttpRequestWrapper(httpRequest))
-        { }
 
-        #region
-        private const string sEchoParameter = "sEcho";
-
-        // 起始索引和长度
-        private const string iDisplayStartParameter = "iDisplayStart";
-        private const string iDisplayLengthParameter = "iDisplayLength";
-
-        // 列数
-        private const string iColumnsParameter = "iColumns";
-        private const string sColumnsParameter = "sColumns";
-
-        // 参与排序列数
-        private const string iSortingColsParameter = "iSortingCols";
-        private const string iSortColPrefixParameter = "iSortCol_";         // 排序列的索引
-        private const string sSortDirPrefixParameter = "sSortDir_";         // 排序的方向 asc, desc
-
-        // 每一列的可排序性
-        private const string bSortablePrefixParameter = "bSortable_";
-
-        // 全局搜索
-        private const string sSearchParameter = "sSearch";
-        private const string bRegexParameter = "bRegex";
-
-        // 每一列的搜索
-        private const string bSearchablePrefixParameter = "bSearchable_";
-        private const string sSearchPrefixParameter = "sSearch_";
-        private const string bEscapeRegexPrefixParameter = "bRegex_";
+        #region 属性
+        public int Draw { get; private set; }
+        /// <summary>
+        /// 列
+        /// </summary>
+        public  List<Column> Columns { get; private set; }
+        /// <summary>
+        /// 跳过的数据数目
+        /// </summary>
+        public int Start { get; private set; }
+        /// <summary>
+        /// 查询的数据
+        /// </summary>
+        public int Length { get; private set; }
+        /// <summary>
+        /// 是否可搜索
+        /// </summary>
+        public Search Search { get; private set; } 
         #endregion
 
-        private readonly string echo;
-        public string sEcho
+        protected List<List<KeyValuePair<string, string>>> GetColumnKeyValues(NameValueCollection collection)
         {
-            get { return echo; }
-        }
+            var keyValues = new List<List<KeyValuePair<string, string>>>();
+            var conunt = collection.AllKeys.Count(x => x.Contains(ColumnPar))/6;
 
-        private readonly int displayStart;
-        public int iDisplayStart
-        {
-            get { return this.displayStart; }
-        }
-
-        private readonly int displayLength;
-        public int iDisplayLength
-        {
-            get { return this.displayLength; }
-        }
-
-        // 参与排序的列
-        private readonly int sortingCols;
-        public int iSortingCols
-        {
-            get { return this.sortingCols; }
-        }
-
-        // 排序列
-        private readonly SortColumn[] sortColumns;
-        public SortColumn[] SortColumns
-        {
-            get { return sortColumns; }
-        }
-
-        private readonly int ColumnCount;
-        public int iColumns
-        {
-            get { return this.ColumnCount; }
-        }
-
-        private readonly Column[] columns;
-        public Column[] Columns
-        {
-            get { return this.columns; }
-        }
-
-        private readonly string search;
-        public string Search
-        {
-            get { return this.search; }
-        }
-
-        private readonly bool regex;
-        public bool Regex
-        {
-            get { return this.regex; }
-        }
-
-        #region 常用的几个解析方法
-        private int ParseIntParameter(string name)          // 解析为整数
-        {
-            int result = 0;
-            string parameter = this._request[name];
-            if (!string.IsNullOrEmpty(parameter))
+            for (var i = 0; i < conunt; i++)
             {
-                int.TryParse(parameter, out result);
+                var key = string.Format("{0}[{1}]", ColumnPar, i);
+
+                var list = collection.AllKeys.Where(x => x.Contains(key)).Select(x => new KeyValuePair<string,string>(x.Replace(key, ""), collection[x])).ToList();
+
+                keyValues.Add(list);
             }
-            return result;
+            return keyValues;
         }
 
-        private string ParseStringParameter(string name)    // 解析为字符串
+        public static int TryParseInt(string str)
         {
-            return this._request[name];
+            var num = 0;
+
+            int.TryParse(str, out num);
+
+            return  num;
         }
 
-        private bool ParseBooleanParameter(string name)     // 解析为布尔类型
+        public static bool TryParseBool(string str)
         {
-            bool result = false;
-            string parameter = this._request[name];
-            if (!string.IsNullOrEmpty(parameter))
-            {
-                bool.TryParse(parameter, out result);
-            }
-            return result;
+            var b = false;
+
+            bool.TryParse(str, out b);
+
+            return b;
         }
-        #endregion
     }
+
+    
 }

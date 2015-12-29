@@ -22,27 +22,28 @@
         </div>
     </div>
     <div class="panel-body">
+        
         <table id="table_server" class="table table-bordered table-striped table-hover">
             <thead>
-                <tr>
-                    <th>营销人员</th>
-                    <th>商户</th>
-                    <th>产品</th>
-                    <th>请求编号</th>
-                    <th>金额</th>
-                    <th>费金</th>
-                    <th>完成时间</th>
-                    <th>账单状态</th>
-                </tr>
+            <tr>
+                <th>营销人员</th>
+                <th>商户</th>
+                <th>产品</th>
+                <th>请求编号</th>
+                <th>金额</th>
+                <th>费金</th>
+                <th>完成时间</th>
+                <th>账单状态</th>
+            </tr>
             </thead>
             <tfoot>
-                    <tr>
-                        <td>总计:</td>
-                        <td colspan="3"></td>
-                        <td><span id="sumAmout"></span></td>
-                        <td><span id="sumExpense"></span></td>
-                        <td colspan="2"></td>
-                    </tr>
+            <tr>
+                <td>总计:</td>
+                <td colspan="3"></td>
+                <td><span id="sumAmout"></span></td>
+                <td><span id="sumExpense"></span></td>
+                <td colspan="2"></td>
+            </tr>
             </tfoot>
         </table>
     </div>
@@ -75,20 +76,20 @@
             sServerMethod: "POST",
             showRowNumber: true,
             ajax: {
-//类似jquery的ajax参数，基本都可以用。
+                //类似jquery的ajax参数，基本都可以用。
                 type: "post", //后台指定了方式，默认get，外加datatable默认构造的参数很长，有可能超过get的最大长度。
                 url: "/bills/SelectBills",
                 dataSrc: "data", //默认data，也可以写其他的，格式化table的时候取里面的数据
                 data: function(d) { //d 是原始的发送给服务器的数据，默认很长。
-                    var param = {}; //因为服务端排序，可以新建一个参数对象
-                    param.start = d.start; //开始的序号
-                    param.length = d.length; //要取的数据的
-                    param.sSearch = d.search.value;
+                    //var param = {}; //因为服务端排序，可以新建一个参数对象
+                    //param.start = d.start; //开始的序号
+                    //param.length = d.length; //要取的数据的
+                    //param.sSearch = d.search.value;
                     //var formData = $("#filter_form").serializeArray();//把form里面的数据序列化成数组
                     //formData.forEach(function (e) {
                     //    param[e.name] = e.value;
                     //});
-                    return param; //自定义需要传递的参数。
+                    return d; //自定义需要传递的参数。
                 },
                 callback: function() {}
             },
@@ -100,7 +101,7 @@
             //completeState=item.CompleteState,
             //productExpense=item.ProductExpense
             columns: [
-//对应上面thead里面的序列
+            //对应上面thead里面的序列
                 { data: "saleName" },
                 { data: "merchantName" },
                  { data: "productName" },
@@ -141,7 +142,7 @@
                     "载入中", //处理页面数据的时候的显示
                 paginate:
                 {
-//分页的样式文本内容。
+                //分页的样式文本内容。
                     previous: "上一页",
                     next:
                         "下一页",
