@@ -241,6 +241,9 @@
     <Compile Include="Domian\Products.cs" />
     <Compile Include="Domian\Salesman.cs" />
     <Compile Include="Domian\UploadInfo.cs" />
+    <Compile Include="Exitens\Excel\BaseGenerateSheet.cs" />
+    <Compile Include="Exitens\Excel\ColumnsMapping.cs" />
+    <Compile Include="Exitens\Excel\GenerateSheet.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -317,6 +320,7 @@
     <Content Include="Content\H\plugins\webuploader\webuploader.css" />
     <Content Include="Content\H\style.css" />
     <Content Include="Content\H\style.min.css" />
+    <Content Include="Content\mycss\searchTools.css" />
     <Content Include="Content\plugins\dataTables\dataTables.min.css" />
     <Content Include="favicon.ico" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />

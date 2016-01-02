@@ -1,0 +1,13 @@
+﻿.tools {
+    height:70px;
+    line-height:70px;
+}
+
+.tools .tool {
+    width:300px;
+    float:left;
+}
+
+    .tool .btn {
+        width:100px;
+    }

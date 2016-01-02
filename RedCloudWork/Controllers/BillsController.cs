@@ -96,7 +96,7 @@ namespace RedCloudWork.Controllers
             }
             return list;
 
-        } 
+        }
         #endregion
 
         // GET: Bills
@@ -147,47 +147,53 @@ namespace RedCloudWork.Controllers
         }
 
         [HttpPost]
-        public JsonResult SelectBills(string sSearch = "", int start = 0, int length = 20)
+        public JsonResult SelectBills()
         {
             var request = Request;
             var billsRepository = ComMethod.GetRepository<Bills>();
             var dataModel = new DataTablesModel(Request);
-            
+
             var query =
                 billsRepository.Table;
             var allCount = query.Count();
 
-            if (sSearch != "")
+            var seachValue = dataModel.Search.Value;
+            if (seachValue != "")
             {
-                query = query.Where(x => x.Salesman.Name.Contains(sSearch) || x.Product.Name.Contains(sSearch)||x.Merchant.Name.Contains(sSearch));
-                if (sSearch == "完成")
+                query = query.Where(x => x.Salesman.Name.Contains(seachValue) || x.Product.Name.Contains(seachValue) || x.Merchant.Name.Contains(seachValue));
+                if (seachValue == "完成")
                 {
-                    query = query.Where(x => x.CompleteState );
+                    query = query.Where(x => x.CompleteState);
                 }
             }
-            var count= query.Count();
-            var sumAmout = count>0? query.Sum(x => x.Amount):0;
-            var sumExpense = count > 0 ? query.Sum(x => x.ProductExpense):0;
+            var count = query.Count();
+            var sumAmout = count > 0 ? query.Sum(x => x.Amount) : 0;
+            var sumExpense = count > 0 ? query.Sum(x => x.ProductExpense) : 0;
 
-            query = query.OrderBy(x=>x.TradingTime).Skip(start).Take(length);
-            
+            query = query.OrderBy(x => x.TradingTime).Skip(dataModel.Start).Take(dataModel.Length);
+
             var pageData = (from item in query
-                select new
-                {
-                    saleName=item.Salesman.Name,
-                    merchantName=item.Merchant.Name,
-                    productName=item.Product.Name,
-                    requestNo=item.ServiceRequestNo,
-                    amount=item.Amount,
-                    completedTime=item.CompletionTime,
-                    completeState=item.CompleteState,
-                    productExpense=item.ProductExpense,
-                }).ToList();
+                            select new
+                            {
+                                saleName = item.Salesman.Name,
+                                merchantName = item.Merchant.Name,
+                                productName = item.Product.Name,
+                                requestNo = item.ServiceRequestNo,
+                                amount = item.Amount,
+                                completedTime = item.CompletionTime,
+                                completeState = item.CompleteState,
+                                productExpense = item.ProductExpense,
+                            }).ToList();
 
-            var restult = new { data = pageData, recordsTotal = allCount, recordsFiltered = count ,sumAmout=sumAmout,sumExpense=sumExpense};
+            var restult = new { data = pageData, recordsTotal = allCount, recordsFiltered = count, sumAmout = sumAmout, sumExpense = sumExpense };
 
             return Json(restult);
         }
+
+        //public ActionResult ExportExcel()
+        //{
+
+        //}
 
     }
 }
